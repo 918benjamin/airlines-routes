@@ -1,7 +1,25 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Table } from 'react-bootstrap';
 import data from './data';
+import Table from './components/Table';
+
+function formatValue(property, value) {
+  let obj;
+
+  if (property === 'airline') {
+    obj = data.getAirlineById(value)
+  } else {
+    obj = data.getAirportByCode(value)
+  }
+
+  return obj.name;
+}
+
+const columns = [
+    {name: 'Airline', property: 'airline'},
+    {name: 'Source Airport', property: 'src'},
+    {name: 'Destination Airport', property: 'dest'},
+];
 
 const App = () => (
   <div className="app container">
@@ -11,18 +29,14 @@ const App = () => (
   <section>
     <p>Welcome to the App</p>
   </section>
+    <Table
+      className="routes-table"
+      columns={columns}
+      rows={data.routes}
+      format={formatValue}
+    />
   <section>
-    <Table>
-      <tbody>
-        {data.routes.map(route => 
-          <tr>
-            <td>{data.getAirlineById(route.airline).name}</td>
-            <td>{data.getAirportByCode(route.src).name}</td>
-            <td>{data.getAirportByCode(route.dest).name}</td>
-          </tr>
-        )}
-      </tbody>
-    </Table>
+
   </section>
 </div>
 )
