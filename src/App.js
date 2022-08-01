@@ -45,7 +45,19 @@ const App = () =>  {
     const airlineId = event.target.value;
 
     if (airlineId) {
-      setRoutes(data.routes.filter(route => route.airline === parseInt(airlineId, 10)));
+      setRoutes(routes.filter(route => route.airline === parseInt(airlineId, 10)));
+    } else {
+      setRoutes(data.routes);
+    }
+  }
+
+  const filterByAirport = (event) => {
+    const airportCode = event.target.value;
+
+    if (airportCode) {
+      setRoutes(routes.filter(route => {
+        return route.src === airportCode || route.dest === airportCode;
+      }));
     } else {
       setRoutes(data.routes);
     }
@@ -67,7 +79,18 @@ const App = () =>  {
               allTitle="All Airlines"
               value=""
               onSelect={filterByAirline}
-              />
+            />
+          </label>
+          <label>
+            flying in or out of
+            <Select
+              options={data.airports}
+              valueKey="code"
+              titleKey="name"
+              allTitle="All Airports"
+              value=""
+              onSelect={filterByAirport}
+            />
           </label>
         </form>
       </section>
