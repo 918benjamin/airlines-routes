@@ -22,21 +22,33 @@ const columns = [
 ];
 
 const App = () =>  {
-  let [ firstRouteToShow, setFirstRouteToShow ] = useState(0)
-  const PER_PAGE = 73;
+  let [ routes, setRoutes ] = useState(data.routes);
+  let [ firstRouteToShow, setFirstRouteToShow ] = useState(0);
+  const PER_PAGE = 25;
 
-  const incrementVisibleRoutes = (event) => {
+  const incrementVisibleRoutes = (_) => {
     setFirstRouteToShow(firstRouteToShow + PER_PAGE)
   }
 
-  const decrementVisibleRoutes = (event) => {
+  const decrementVisibleRoutes = (_) => {
     setFirstRouteToShow(firstRouteToShow - PER_PAGE)
   }
 
   const topOfRange = function() {
-    return firstRouteToShow + PER_PAGE <= data.routes.length ?
+    return firstRouteToShow + PER_PAGE <= routes.length ?
       firstRouteToShow + PER_PAGE :
-      data.routes.length
+      routes.length
+  }
+
+  const filterByAirline = (event) => {
+    const airlineName = event.target.value;
+
+    if (airlineName) {
+      const airline = data.getAirlineByName(airlineName);
+      setRoutes(data.routes.filter(route => route.airline === airline.id));
+    } else {
+      setRoutes(data.routes);
+    }
   }
 
   return (
@@ -45,18 +57,28 @@ const App = () =>  {
         <h1 className="title">Airline Routes</h1>
       </header>
       <section>
-        <p>Welcome to the App</p>
+        <form>
+          <label>
+            Show routes on
+            <select onChange={filterByAirline} name="airline" id="airline-select">
+              <option key="all" value="">All Airlines</option>
+              {data.airlines.map(airline => 
+                <option key={airline.id} value={airline.name}>{airline.name}</option>
+              )}
+            </select>
+          </label>
+        </form>
       </section>
         <Table
           className="routes-table"
           columns={columns}
-          rows={data.routes}
+          rows={routes}
           format={formatValue}
           rowsPerPage={PER_PAGE}
           firstRow={firstRouteToShow}
         />
 
-        <p>{`Showing ${firstRouteToShow+1}-${topOfRange()} of ${data.routes.length} routes`}</p>
+        <p>{`Showing ${firstRouteToShow+1}-${topOfRange()} of ${routes.length} routes`}</p>
         <button
           disabled={firstRouteToShow === 0 ? true : false}
           onClick={decrementVisibleRoutes}
@@ -64,7 +86,7 @@ const App = () =>  {
         Previous Page
         </button>
         <button
-        disabled={firstRouteToShow + PER_PAGE >= data.routes.length ? true : false}
+        disabled={firstRouteToShow + PER_PAGE >= routes.length ? true : false}
         onClick={incrementVisibleRoutes}>Next Page</button>
     </div>
   )
