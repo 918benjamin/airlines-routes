@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import data from './data';
 import Table from './components/Table';
@@ -25,6 +25,7 @@ const columns = [
 const App = () =>  {
   let [ routes, setRoutes ] = useState(data.routes);
   let [ firstRouteToShow, setFirstRouteToShow ] = useState(0);
+  let [ isFiltered, setIsFiltered ] = useState(false);
   const PER_PAGE = 25;
 
   const incrementVisibleRoutes = (_) => {
@@ -46,8 +47,10 @@ const App = () =>  {
 
     if (airlineId) {
       setRoutes(routes.filter(route => route.airline === parseInt(airlineId, 10)));
+      setIsFiltered(true)
     } else {
       setRoutes(data.routes);
+      setIsFiltered(false)
     }
   }
 
@@ -58,9 +61,18 @@ const App = () =>  {
       setRoutes(routes.filter(route => {
         return route.src === airportCode || route.dest === airportCode;
       }));
+      setIsFiltered(true)
     } else {
       setRoutes(data.routes);
+      setIsFiltered(false)
     }
+  }
+
+  const resetFilters = (event) => {
+    event.preventDefault();
+    setIsFiltered(false);
+    setRoutes(data.routes);
+    document.getElementById("filter").reset();
   }
 
   return (
@@ -69,7 +81,7 @@ const App = () =>  {
         <h1 className="title">Airline Routes</h1>
       </header>
       <section>
-        <form>
+        <form id="filter">
           <label>
             Show routes on
             <Select
@@ -92,6 +104,7 @@ const App = () =>  {
               onSelect={filterByAirport}
             />
           </label>
+          <button disabled={!isFiltered} onClick={resetFilters}>Show All Routes</button>
         </form>
       </section>
         <Table
