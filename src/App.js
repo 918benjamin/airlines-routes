@@ -2,6 +2,7 @@ import React, { Component, useState } from 'react';
 import './App.css';
 import data from './data';
 import Table from './components/Table';
+import Select from './components/Select';
 
 function formatValue(property, value) {
   let obj;
@@ -41,11 +42,10 @@ const App = () =>  {
   }
 
   const filterByAirline = (event) => {
-    const airlineName = event.target.value;
+    const airlineId = event.target.value;
 
-    if (airlineName) {
-      const airline = data.getAirlineByName(airlineName);
-      setRoutes(data.routes.filter(route => route.airline === airline.id));
+    if (airlineId) {
+      setRoutes(data.routes.filter(route => route.airline === parseInt(airlineId, 10)));
     } else {
       setRoutes(data.routes);
     }
@@ -60,12 +60,14 @@ const App = () =>  {
         <form>
           <label>
             Show routes on
-            <select onChange={filterByAirline} name="airline" id="airline-select">
-              <option key="all" value="">All Airlines</option>
-              {data.airlines.map(airline => 
-                <option key={airline.id} value={airline.name}>{airline.name}</option>
-              )}
-            </select>
+            <Select
+              options={data.airlines}
+              valueKey="id"
+              titleKey="name"
+              allTitle="All Airlines"
+              value=""
+              onSelect={filterByAirline}
+              />
           </label>
         </form>
       </section>

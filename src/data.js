@@ -1401,12 +1401,6 @@ const getAirlineById = function(id) {
   return airline;
 };
 
-const getAirlineByName = function(name) {
-  const airline = airlines.find(airline => airline.name === name);
-
-  return airline;
-};
-
 const getAirportByCode = function(code) {
   const airport = airports.find(airport => airport.code === code);
 
@@ -1419,5 +1413,4 @@ export default {
   airports,
   getAirlineById,
   getAirportByCode,
-  getAirlineByName,
 };
