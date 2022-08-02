@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import data from './data';
-import Table from './components/Table';
-import Select from './components/Select';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import data from "./data";
+
+import Table from "./components/Table";
+import Select from "./components/Select";
+import Map from "./components/Map";
 
 function formatValue(property, value) {
   let obj;
 
-  if (property === 'airline') {
+  if (property === "airline") {
     obj = data.getAirlineById(value)
   } else {
     obj = data.getAirportByCode(value)
@@ -17,9 +19,9 @@ function formatValue(property, value) {
 }
 
 const columns = [
-    {name: 'Airline', property: 'airline'},
-    {name: 'Source Airport', property: 'src'},
-    {name: 'Destination Airport', property: 'dest'},
+    {name: "Airline", property: "airline"},
+    {name: "Source Airport", property: "src"},
+    {name: "Destination Airport", property: "dest"},
 ];
 
 const App = () =>  {
@@ -127,6 +129,9 @@ const App = () =>  {
       <header className="header">
         <h1 className="title">Airline Routes</h1>
       </header>
+      <section>
+        <Map routes={routes} format={data.getAirportByCode} />
+      </section>
       <section>
         <form id="filter">
           <label>
