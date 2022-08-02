@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import data from './data';
 import Table from './components/Table';
@@ -25,8 +25,40 @@ const columns = [
 const App = () =>  {
   let [ routes, setRoutes ] = useState(data.routes);
   let [ firstRouteToShow, setFirstRouteToShow ] = useState(0);
+  let [ selectedAirline, setSelectedAirline ] = useState("");
+  let [ selectedAirport, setSelectedAirport ] = useState("");
   let [ isFiltered, setIsFiltered ] = useState(false);
+  let [ filteredAirlines, setFilteredAirlines ] = useState(data.airlines);
+  let [ filteredAirports, setFilteredAirports ] = useState(data.airports);
   const PER_PAGE = 25;
+
+  useEffect(() => {
+    if (selectedAirline && selectedAirport) {
+      setRoutes(data.routes.filter(route => {
+        return route.airline === selectedAirline &&
+        (route.src === selectedAirport || route.dest === selectedAirport);
+      }));
+
+      setIsFiltered(true)
+    } else if (selectedAirline) {
+      setRoutes(data.routes.filter(route => {
+        return route.airline === selectedAirline;
+      }));
+      setIsFiltered(true)
+    } else if (selectedAirport) {
+      setRoutes(data.routes.filter(route => {
+        return route.src === selectedAirport || route.dest === selectedAirport;
+      }));
+      setIsFiltered(true)
+    } else {
+      setRoutes(data.routes)
+      setIsFiltered(false)
+    }
+  }, [selectedAirline, selectedAirport])
+
+  useEffect(() => {
+
+  }, [routes])
 
   const incrementVisibleRoutes = (_) => {
     setFirstRouteToShow(firstRouteToShow + PER_PAGE)
@@ -42,41 +74,65 @@ const App = () =>  {
       routes.length
   }
 
-  const filterByAirline = (event) => {
-    const airlineId = event.target.value;
+  const selectAirline = (event) => {
+    setSelectedAirline(parseInt(event.target.value, 10));
 
-    if (airlineId) {
-      setRoutes(routes.filter(route => route.airline === parseInt(airlineId, 10)));
-      setIsFiltered(true)
-    } else {
-      setRoutes(data.routes);
-      setIsFiltered(false)
-    }
+    // if (selectedAirline) {
+    //   setRoutes(routes.filter(route => route.airline === selectedAirline));
+    //   setFilteredAirlines(filteredAirlines.map(airline => {
+    //     if (airline.id === selectedAirline) {
+    //       return {...airline, disabled: false}
+    //     } else {
+    //       return {...airline, disabled: true}
+    //     }
+    //   }))
+    //   setIsFiltered(true)
+    // } else {
+    //   setRoutes(data.routes);
+    //   setFilteredAirlines(data.airlines)
+    //   setIsFiltered(false)
+    // }
   }
 
-  const filterByAirport = (event) => {
-    const airportCode = event.target.value;
+  const selectAirport = (event) => {
+    setSelectedAirport(event.target.value);
+    // if (selectedAirport) {
+    //   setRoutes(routes.filter(route => {
+    //     return route.src === selectedAirport || route.dest === selectedAirport;
+    //   }));
+      // let airportCodes;
+      // airportCodes = routes.map(route => [route.src, route.dest]).flat();
+      // airportCodes = [...new Set(airportCodes)];
 
-    if (airportCode) {
-      setRoutes(routes.filter(route => {
-        return route.src === airportCode || route.dest === airportCode;
-      }));
-      setIsFiltered(true)
-    } else {
-      setRoutes(data.routes);
-      setIsFiltered(false)
-    }
+      // setFilteredAirports(filteredAirports.map(airport => {
+      //   if (airportCodes.includes(airport.code)) {
+      //     return {...airport, disabled: false}
+      //   } else {
+      //     return {...airport, disabled: true}
+      //   }
+      // }))
+
+    //   setIsFiltered(true)
+    // } else {
+    //   setRoutes(data.routes);
+    //   setFilteredAirports(data.airports);
+    //   setIsFiltered(false)
+    // }
   }
 
   const resetFilters = (event) => {
     event.preventDefault();
     setIsFiltered(false);
     setRoutes(data.routes);
+    // setFilteredAirlines(data.airlines);
+    // setFilteredAirports(data.airports);
+    setSelectedAirline("");
+    setSelectedAirport("");
     document.getElementById("filter").reset();
   }
 
   return (
-    <div className="app container">
+    <div className="app">
       <header className="header">
         <h1 className="title">Airline Routes</h1>
       </header>
@@ -85,23 +141,23 @@ const App = () =>  {
           <label>
             Show routes on
             <Select
-              options={data.airlines}
-              valueKey="id"
-              titleKey="name"
+              options={filteredAirlines}
+              valueKey="id" // option[valueKey] == route.id
+              titleKey="name" // option[titleKey] == route.name
               allTitle="All Airlines"
-              value=""
-              onSelect={filterByAirline}
+              value={selectedAirline} // This is what we want to select (default "")
+              onSelect={selectAirline}
             />
           </label>
           <label>
             flying in or out of
             <Select
-              options={data.airports}
-              valueKey="code"
+              options={filteredAirports}
+              valueKey="code" // option[valueKey] == route.code
               titleKey="name"
               allTitle="All Airports"
-              value=""
-              onSelect={filterByAirport}
+              value={selectedAirport}
+              onSelect={selectAirport}
             />
           </label>
           <button disabled={!isFiltered} onClick={resetFilters}>Show All Routes</button>
