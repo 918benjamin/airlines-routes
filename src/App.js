@@ -57,6 +57,36 @@ const App = () =>  {
   }, [selectedAirline, selectedAirport])
 
   useEffect(() => {
+    const enabledAirlines = [];
+    const enabledAirports = [];
+
+    routes.forEach(route => {
+      if (!enabledAirlines.includes(route.airline)) {
+        enabledAirlines.push(route.airline);
+      }
+
+      if (!enabledAirports.includes(route.src)) {
+        enabledAirports.push(route.src);
+      }
+
+      if (!enabledAirports.includes(route.dest)) {
+        enabledAirports.push(route.dest);
+      }
+    });
+
+    setFilteredAirlines(data.airlines.map(airline => {
+      if (enabledAirlines.includes(airline.id)) {
+        return {...airline, disabled: false}
+      }
+      return {...airline, disabled: true}
+    }))
+
+    setFilteredAirports(data.airports.map(airport => {
+      if (enabledAirports.includes(airport.code)) {
+        return {...airport, disabled: false}
+      }
+      return {...airport, disabled: true}
+    }))
 
   }, [routes])
 
@@ -76,59 +106,20 @@ const App = () =>  {
 
   const selectAirline = (event) => {
     setSelectedAirline(parseInt(event.target.value, 10));
-
-    // if (selectedAirline) {
-    //   setRoutes(routes.filter(route => route.airline === selectedAirline));
-    //   setFilteredAirlines(filteredAirlines.map(airline => {
-    //     if (airline.id === selectedAirline) {
-    //       return {...airline, disabled: false}
-    //     } else {
-    //       return {...airline, disabled: true}
-    //     }
-    //   }))
-    //   setIsFiltered(true)
-    // } else {
-    //   setRoutes(data.routes);
-    //   setFilteredAirlines(data.airlines)
-    //   setIsFiltered(false)
-    // }
   }
 
   const selectAirport = (event) => {
     setSelectedAirport(event.target.value);
-    // if (selectedAirport) {
-    //   setRoutes(routes.filter(route => {
-    //     return route.src === selectedAirport || route.dest === selectedAirport;
-    //   }));
-      // let airportCodes;
-      // airportCodes = routes.map(route => [route.src, route.dest]).flat();
-      // airportCodes = [...new Set(airportCodes)];
-
-      // setFilteredAirports(filteredAirports.map(airport => {
-      //   if (airportCodes.includes(airport.code)) {
-      //     return {...airport, disabled: false}
-      //   } else {
-      //     return {...airport, disabled: true}
-      //   }
-      // }))
-
-    //   setIsFiltered(true)
-    // } else {
-    //   setRoutes(data.routes);
-    //   setFilteredAirports(data.airports);
-    //   setIsFiltered(false)
-    // }
   }
 
   const resetFilters = (event) => {
     event.preventDefault();
     setIsFiltered(false);
     setRoutes(data.routes);
-    // setFilteredAirlines(data.airlines);
-    // setFilteredAirports(data.airports);
+    setFilteredAirlines(data.airlines);
+    setFilteredAirports(data.airports);
     setSelectedAirline("");
     setSelectedAirport("");
-    document.getElementById("filter").reset();
   }
 
   return (
@@ -142,10 +133,10 @@ const App = () =>  {
             Show routes on
             <Select
               options={filteredAirlines}
-              valueKey="id" // option[valueKey] == route.id
-              titleKey="name" // option[titleKey] == route.name
+              valueKey="id"
+              titleKey="name"
               allTitle="All Airlines"
-              value={selectedAirline} // This is what we want to select (default "")
+              value={selectedAirline}
               onSelect={selectAirline}
             />
           </label>
@@ -153,7 +144,7 @@ const App = () =>  {
             flying in or out of
             <Select
               options={filteredAirports}
-              valueKey="code" // option[valueKey] == route.code
+              valueKey="code"
               titleKey="name"
               allTitle="All Airports"
               value={selectedAirport}
